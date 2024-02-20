@@ -1,0 +1,159 @@
+<html>
+
+<head>
+  <title>Thermometer Lab</title>
+  <meta charset="UTF-8">
+</head>
+
+<body>
+  <h1>Thermometer Lab</h1>
+  <div>
+    <svg version="1.1" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" height="50%" width="75%">
+      <style>
+        #glass {
+          fill: #ffffff;
+          stroke: #cccccc;
+          stroke-width: 3;
+        }
+
+        #container {
+          fill: #ffffff;
+          stroke: #000000;
+          stroke-width: 5;
+        }
+
+        #liquid1{
+          fill: blue;
+        }
+        #liquid2{
+          fill: blue;
+        }
+      </style>
+
+      <rect id="container" x="10" y="10" width="130" height="210" rx="15" />
+
+      <g id="glass">
+        <rect x="45" y="20" width="30" height="160" rx="15" />
+        <ellipse cx="60" cy="180" rx="30" ry="30" />
+        <rect x="46.5" y="22" width="27" height="165" rx="15" stroke="none" />
+        <ellipse id="liquid1" cx="60" cy="180" rx="24" ry="24"  stroke="none" />
+        <rect id="liquid2" y="25" x="50" width="20" height="165" rx="10" stroke="none" />
+        <path d=" M 63 197 A 17 17 358 0 1 47 169" fill="none" stroke="white" stroke-linecap="round"/>
+        <path d=" M 53 165 A 17 17 40 0 1 58 163" fill="none" stroke="white" stroke-linecap="round"/>
+      </g>
+
+      <g id="ticks">
+
+  <line x1="79" y1="20" x2="100" y2="20" stroke-width="3" stroke="black"stroke-linecap="round" />
+  <line x1="79" y1="35" x2="90" y2="35" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="50" x2="100" y2="50" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="65" x2="90" y2="65" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="80" x2="100" y2="80" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="95" x2="90" y2="95" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="110" x2="100" y2="110" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="125" x2="90" y2="125" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="79" y1="140" x2="100" y2="140" stroke-width="3"stroke="black" stroke-linecap="round"/>
+  <line x1="83" y1="155" x2="90" y2="155" stroke-width="3"stroke="black" stroke-linecap="round"/>
+</g>
+<g id="labels">
+  <text x="93" y="37" font-size="10">Label1</text>
+  <text x="93" y="67" font-size="10">Label2</text>
+  <text x="93" y="97" font-size="10">Label3</text>
+  <text x="93" y="127" font-size="10">Label2</text>
+  <text x="93" y="157" font-size="10">Label3</text>
+</g>
+    </svg>
+
+  </div>
+  <form>
+<fieldset>
+  <legend>Please select your preferred unit:</legend>
+  <div>
+    <input type="radio" id="unitChoice1" name="unit" value="Fahrenheit" checked/>
+    <label for="contactChoice1">Fahrenheit</label>
+    <input type="radio" id="unitChoice2" name="unit" value="Celsius" />
+    <label for="contactChoice2">Celsius</label>
+  </div>
+</fieldset>
+</form>
+  <div>
+      <input type="range" id="temperatureSlider" min="0" max="212" value="72" />
+      <label for="temperatureSlider">Temperature</label>
+      <span id="temperatureValue">50ºF</span>
+  </div>
+  <script>
+  let slider = document.getElementById('temperatureSlider');
+  let liquid1 = document.getElementById('liquid1');
+  let liquid2 = document.getElementById('liquid2');
+  let temperatureValue = document.getElementById('temperatureValue');
+  const radios = document.querySelectorAll('input[type="radio"][name="unit"]');
+  let unit = 'Fahrenheit'; // Initialize unit to Fahrenheit
+
+  const updateTemperatureDisplay = (sliderValue, unit) => {
+    let temperature;
+    sliderValue = Number(sliderValue); // Convert sliderValue to a number
+    if (unit === 'Fahrenheit') {
+      temperature = sliderValue;
+      temperatureValue.textContent = `${temperature.toFixed(1)}°F`;
+    } else if (unit === 'Celsius') {
+      temperature = (sliderValue - 32) * 5 / 9;
+      temperatureValue.textContent = `${temperature.toFixed(1)}°C`;
+    }
+  };
+
+  const updateLiquidLevel = (sliderValue, unit) => {
+  let maxY = 97;
+  let minY = 160;
+  let newY = minY - (sliderValue / 100) * (minY - maxY);
+  liquid2.setAttribute('y', newY);
+  liquid2.setAttribute('height', 165-newY);
+  updateTemperatureDisplay(slider.value, unit);
+  };
+
+  const updateLabels = (unit) => {
+  const labels = document.querySelectorAll('#labels text');
+  let labelTemps = [169.6, 127.2, 84.8, 42.4, 0];
+  labels.forEach((label, index) => {
+    let temp = labelTemps[index];
+    if (unit === 'Fahrenheit') {
+      label.textContent = `${temp.toFixed(1)}°F`;
+    } else if (unit === 'Celsius') {
+      temp = (temp - 32) * 5 / 9;
+      label.textContent = `${temp.toFixed(1)}°C`;
+    }
+  });
+};
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', (event) => {
+        unit = event.target.value;
+        updateLiquidLevel(slider.value, unit);
+        updateLabels(unit);
+      });
+    });
+
+    slider.addEventListener('input', () => {
+    const sliderValue = slider.value;
+    let color;
+
+    if (sliderValue <= 32) {
+      color = 'blue';
+    } else if (sliderValue <= 170) {
+      color = 'orange';
+    } else {
+      color = 'red';
+    }
+
+    liquid1.style.fill = color;
+    liquid2.style.fill = color;
+    updateLiquidLevel(slider.value, unit);
+  });
+
+  updateLiquidLevel(slider.value, unit)
+  updateLabels(unit);
+</script>
+
+
+</body>
+
+</html>
